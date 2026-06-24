@@ -1,6 +1,30 @@
 import streamlit as st
 
 
+# Helpers to manage dynamic counts in session state
+def _ensure_state():
+    if "num_credit_cards" not in st.session_state:
+        st.session_state.num_credit_cards = 2
+    if "num_loc_accounts" not in st.session_state:
+        st.session_state.num_loc_accounts = 1
+
+
+def inc_cards():
+    st.session_state.num_credit_cards = min(8, st.session_state.num_credit_cards + 1)
+
+
+def dec_cards():
+    st.session_state.num_credit_cards = max(1, st.session_state.num_credit_cards - 1)
+
+
+def inc_locs():
+    st.session_state.num_loc_accounts = min(4, st.session_state.num_loc_accounts + 1)
+
+
+def dec_locs():
+    st.session_state.num_loc_accounts = max(0, st.session_state.num_loc_accounts - 1)
+
+
 def calculate_utilization(balance: float, limit: float) -> float:
     if limit <= 0:
         return 0.0
@@ -129,9 +153,14 @@ with st.form("credit_form"):
     desired_score = st.number_input("Desired Credit Score", min_value=300, max_value=900, value=750, step=1)
 
     st.subheader("Credit Card Accounts")
-    num_credit_cards = st.number_input("Number of credit cards", min_value=1, max_value=8, value=2, step=1)
+    _ensure_state()
+    cols = st.columns([4, 1, 1])
+    cols[0].markdown("Number of credit cards")
+    cols[1].button("-", on_click=dec_cards, key="dec_cards")
+    cols[2].button("+", on_click=inc_cards, key="inc_cards")
+    st.write(st.session_state.num_credit_cards)
     accounts = []
-    for i in range(int(num_credit_cards)):
+    for i in range(int(st.session_state.num_credit_cards)):
         balance = st.number_input(
             f"Credit Card {i+1} Balance (CAD)",
             min_value=0.0,
@@ -151,8 +180,12 @@ with st.form("credit_form"):
         accounts.append({"name": f"Credit Card {i+1}", "balance": balance, "limit": limit})
 
     st.subheader("Unsecured Line(s) of Credit")
-    num_loc_accounts = st.number_input("Number of unsecured LOCs", min_value=0, max_value=4, value=1, step=1)
-    for i in range(int(num_loc_accounts)):
+    cols = st.columns([4, 1, 1])
+    cols[0].markdown("Number of unsecured LOCs")
+    cols[1].button("-", on_click=dec_locs, key="dec_locs")
+    cols[2].button("+", on_click=inc_locs, key="inc_locs")
+    st.write(st.session_state.num_loc_accounts)
+    for i in range(int(st.session_state.num_loc_accounts)):
         balance = st.number_input(
             f"Unsecured LOC {i+1} Balance (CAD)",
             min_value=0.0,
