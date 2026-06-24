@@ -118,8 +118,8 @@ def build_timeline(current_score: int, desired_score: int, accounts: list[dict],
     }
 
 
-st.set_page_config(page_title="Canadian Credit Optimization", layout="centered")
-st.title("Canadian Credit Planning — Streamlit Demo")
+st.set_page_config(page_title="Canadian Credit Planning Score", layout="centered")
+st.title("Canadian Credit Planning Score")
 st.markdown(
     "Enter your current Canadian credit profile and monthly paydown budget to generate a month-by-month repayment strategy."
 )
