@@ -148,18 +148,28 @@ st.markdown(
     "Enter your current Canadian credit profile and monthly paydown budget to generate a month-by-month repayment strategy."
 )
 
+# Ensure session state and render controls outside the form (forms disallow callbacks)
+_ensure_state()
+st.subheader("Credit Card Accounts")
+cols = st.columns([4, 1, 1])
+cols[0].markdown("Number of credit cards")
+cols[1].button("-", on_click=dec_cards, key="dec_cards_control")
+cols[2].button("+", on_click=inc_cards, key="inc_cards_control")
+st.write(st.session_state.num_credit_cards)
+
+st.subheader("Unsecured Line(s) of Credit")
+cols = st.columns([4, 1, 1])
+cols[0].markdown("Number of unsecured LOCs")
+cols[1].button("-", on_click=dec_locs, key="dec_locs_control")
+cols[2].button("+", on_click=inc_locs, key="inc_locs_control")
+st.write(st.session_state.num_loc_accounts)
+
 with st.form("credit_form"):
     current_score = st.number_input("Current Credit Score", min_value=300, max_value=900, value=620, step=1)
     desired_score = st.number_input("Desired Credit Score", min_value=300, max_value=900, value=750, step=1)
 
-    st.subheader("Credit Card Accounts")
-    _ensure_state()
-    cols = st.columns([4, 1, 1])
-    cols[0].markdown("Number of credit cards")
-    cols[1].button("-", on_click=dec_cards, key="dec_cards")
-    cols[2].button("+", on_click=inc_cards, key="inc_cards")
-    st.write(st.session_state.num_credit_cards)
     accounts = []
+    st.subheader("Credit Card Accounts")
     for i in range(int(st.session_state.num_credit_cards)):
         balance = st.number_input(
             f"Credit Card {i+1} Balance (CAD)",
@@ -180,11 +190,6 @@ with st.form("credit_form"):
         accounts.append({"name": f"Credit Card {i+1}", "balance": balance, "limit": limit})
 
     st.subheader("Unsecured Line(s) of Credit")
-    cols = st.columns([4, 1, 1])
-    cols[0].markdown("Number of unsecured LOCs")
-    cols[1].button("-", on_click=dec_locs, key="dec_locs")
-    cols[2].button("+", on_click=inc_locs, key="inc_locs")
-    st.write(st.session_state.num_loc_accounts)
     for i in range(int(st.session_state.num_loc_accounts)):
         balance = st.number_input(
             f"Unsecured LOC {i+1} Balance (CAD)",
